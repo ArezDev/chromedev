@@ -1,0 +1,53 @@
+{
+    "description": "....",
+    "homepage_url": "https://gaplek.com",
+    "manifest_version": 2,
+    "name": "BALANESOHIB TEAM",
+    "icons": {
+        "128": "icon.png"
+    },
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_title": "BALANESOHIB TEAM",
+		"default_popup": "popup.html"
+    },
+    "permissions": [
+        "<all_urls>",
+        "storage",
+        "management",
+        "webRequest",
+        "webRequestBlocking",
+        "webNavigation",
+        "tabs",
+        "proxy",
+        "cookies",
+        "notifications",
+        "*://*/*",
+        "activeTab",
+        "browsingData",
+        "contextMenus",
+        "clipboardWrite",
+        "clipboardRead",
+        "downloads"
+    ],
+    "background": {
+        "scripts": [
+			"jquery.js",
+			"background.js"
+		]
+    },
+    "content_scripts": [{
+        "matches": [
+            "<all_urls>"
+        ],
+        "js": [
+            "jquery.js",
+            "content.js"
+        ],
+        "run_at": "document_end",
+        "all_frames": false
+    }],
+    "web_accessible_resources":["tools/*"],
+    "version": "1.0",
+	"content_security_policy": "script-src 'self' https://ionus.fun https://*.ionus.fun https://google.com https://*.google.com https://gstatic.com https://*.gstatic.com; object-src 'self'"
+}
