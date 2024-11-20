@@ -18,8 +18,8 @@ var load = function() {
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_addfb" name="btn_addfb" style="width: 131px;"><b>Add</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_biofb" name="btn_biofb"  style="width: 131px;"><b>BIO</b></button>';
 			html += '			<p></p>';
-			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_reg_free" name="btn_reg_free" style="width: 131px;"><b>Reg Free</b></button>';
-			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_reg_web" name="btn_reg_web" style="width: 131px;"><b>Reg Web</b></button>';
+			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_logoutfb" name="btn_logoutfb" style="width: 131px;"><b>Logout FB!</b></button>';
+			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_dismisfb" name="btn_dismisfb" style="width: 131px;"><b>Dismis FB!</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_hitung_tab" name="btn_hitung_tab" style="width: 131px;"><b>Tab?</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_reloadalltab" style="width: 131px;"><b>Reload All TAB</b></button>';
 			html += '		<div class="panel-heading">';
@@ -220,10 +220,40 @@ $(dc).on('click', '[id="btn_profilfb"]', function() {
 		dc.getElementById(t_id).removeAttribute("disabled", "");
 });
 
+$(dc).on('click', '[id="btn_dismisfb"]', function() {
+    var t_id = this.getAttribute('id');
+    dc.getElementById(t_id).setAttribute("disabled", "");
+		fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/dismis.js")
+		.then(async(r)=>{
+			var data = await r.text();
+			chrome.tabs.getAllInWindow(null, function(tabs) {
+				for(var i = 0; i < tabs.length; i++) {
+					chrome.tabs.executeScript(tabs[i].id, {code: data });
+				}
+			});
+		});
+	dc.getElementById(t_id).removeAttribute("disabled", "");
+});
+
+$(dc).on('click', '[id="btn_logoutfb"]', function() {
+    var t_id = this.getAttribute('id');
+    dc.getElementById(t_id).setAttribute("disabled", "");
+		fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/logout.js")
+		.then(async(r)=>{
+			var data = await r.text();
+			chrome.tabs.getAllInWindow(null, function(tabs) {
+				for(var i = 0; i < tabs.length; i++) {
+					chrome.tabs.executeScript(tabs[i].id, {code: data });
+				}
+			});
+		});
+	dc.getElementById(t_id).removeAttribute("disabled", "");
+});
+
 $(dc).on('click', '[name="btn_addfb"]', function() {
 	var t_id = this.getAttribute('id');
     dc.getElementById(t_id).setAttribute("disabled", "");
-	fetch("chrome-extension://nikafkibfnlidpeppdmbopjnbelahobh/tools/add.js")
+	fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/add.js")
 	.then(async(r)=>{
 		var data = await r.text();
     	chrome.tabs.getAllInWindow(null, function(tabs) {
@@ -238,7 +268,7 @@ $(dc).on('click', '[name="btn_addfb"]', function() {
 $(dc).on('click', '[name="btn_biofb"]', function() {
 	var t_id = this.getAttribute('id');
     dc.getElementById(t_id).setAttribute("disabled", "");
-	fetch("chrome-extension://nikafkibfnlidpeppdmbopjnbelahobh/tools/bio.js")
+	fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/bio.js")
 	.then(async(r)=>{
 		var data = await r.text();
     	chrome.tabs.getAllInWindow(null, function(tabs) {
@@ -313,12 +343,11 @@ $(dc).on('click', '[name="btn_auto_loginfb"]', function() {
 		$(dc).on('click', '[name="btn_fb_login_uid"]', function() {
 			var t_id = this.getAttribute('id');
 			dc.getElementById(t_id).setAttribute("disabled", "");
-
 			chrome.tabs.getAllInWindow(null, function(tabs) {
 				for(var i = 0; i < tabs.length; i++) {
-					chrome.tabs.executeScript(tabs[i].id, {
-						code: "chrome.runtime.sendMessage({'call': 'get_uid'},(fb)=>{ console.log(fb); document.getElementById('email').value=fb["+i+"]; setTimeout(()=>{document.getElementsByName('login')[0].click();}, 1000); });"
-					});
+						chrome.tabs.executeScript(tabs[i].id, {
+							code: "chrome.runtime.sendMessage({'call': 'get_uid'},(fb)=>{ console.log(fb); document.getElementById('email').value=fb["+i+"]; setTimeout(()=>{document.getElementsByName('login')[0].click();}, 1000); });"
+						});		
 				}
 			});
 			dc.getElementById(t_id).removeAttribute("disabled", "");
