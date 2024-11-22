@@ -1,8 +1,20 @@
 chrome.runtime.onMessage.addListener(function (a, b, c) {
-    if(a.get=="windowId"){
-      chrome.windows.onRemoved.addListener(function(f) {
-        
-      c("ini => " + f);
+    if(a.upload=="foto"){
+      const imageUrlToBase64 = async (url) => {
+        const data = await fetch(url);
+        const blob = await data.blob();
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.readAsDataURL(blob);
+          reader.onloadend = () => {
+            const base64data = reader.result;
+            resolve(base64data);
+          };
+          reader.onerror = reject;
+        });
+      };
+      imageUrlToBase64(a.url).then((result) => {
+        c("'" + result + "'");
       });
     }
     if(a.vpn == "on"){
