@@ -27,7 +27,7 @@ var load = function() {
 			html += '		</div>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_uploadfb" name="btn_uploadfb" style="width: 131px;"><b>Upload Photo</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_errorfb" name="btn_errorfb" style="width: 131px;" disabled><b>Coming soon!</b></button>';
-			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_profilfb" style="width: 131px;"><b>Profile</b></button>';
+			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_profilfb" style="width: 131px;" disabled><b>Coming soon!</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_changeemail" style="width: 131px;" disabled><b>Coming soon!</b></button>';
 			html += '		<div class="panel-heading">';
 			html += '			<b style="color: green;">Bookmarks</b>';
@@ -219,19 +219,23 @@ $(dc).on('click', '[name="btn_1"]', function() {
 $(dc).on('click', '[id="btn_uploadfb"]', function() {
     var t_id = this.getAttribute('id');
     dc.getElementById(t_id).setAttribute("disabled", "");
-	chrome.runtime.sendMessage({upload:"foto",url:"https://balanesohib.team/foto/a%20(7).jpg"},(a)=>{
-		console.log(a);
-		fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/image_upload.js")
-		.then(async(r)=>{
-			var data = await r.text();
-			chrome.tabs.getAllInWindow(null, function(tabs) {
-				for(var i = 0; i < tabs.length; i++) {
-					chrome.tabs.executeScript(tabs[i].id, { code: data + 'start('+a+')' });
-				}
-			});
+
+
+	fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/image_upload.js")
+	.then(async(r)=>{
+		var data = await r.text();
+		chrome.tabs.getAllInWindow(null, function(tabs) {
+			for (let i = 0; i < tabs.length; i++) {
+				//chrome.tabs.executeScript(tabs[i].id, { code: data + 'start("")' });
+				chrome.runtime.sendMessage({upload:"foto"},(img)=>{
+					console.log(img);
+					chrome.tabs.executeScript(tabs[i].id, { code: data + 'start('+img+');' });
+				});
+				
+			}
 		});
 	});
-    	
+
 
 	dc.getElementById(t_id).removeAttribute("disabled", "");
 });

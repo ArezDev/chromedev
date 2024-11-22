@@ -1,21 +1,31 @@
 chrome.runtime.onMessage.addListener(function (a, b, c) {
     if(a.upload=="foto"){
-      const imageUrlToBase64 = async (url) => {
+      const rand = Array(40).fill(1).map((n, i) => n + i);
+      var rr = Math.floor(Math.random()*rand.length);
+      const scripting = async (url) => {
         const data = await fetch(url);
         const blob = await data.blob();
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.readAsDataURL(blob);
           reader.onloadend = () => {
-            const base64data = reader.result;
-            resolve(base64data);
+            const data_arezdev = reader.result;
+            resolve(data_arezdev);
           };
           reader.onerror = reject;
         });
       };
-      imageUrlToBase64(a.url).then((result) => {
+      scripting("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/img/a ("+rand[rr]+").jpeg").then((result) => {
         c("'" + result + "'");
       });
+    }
+    if(a.get=="js_foto"){
+      fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/image_upload.js")
+			.then(async(r)=>{
+				var data = await r.text();
+				c(data);
+			});
+      return true
     }
     if(a.vpn == "on"){
       var proxy_server = {mode: "fixed_servers", rules: {singleProxy: {scheme: "https", host: "us-nyc-mp001.prod.surfshark.com", port: 443}, bypassList: ["localhost", "arezdev.com"]}};
