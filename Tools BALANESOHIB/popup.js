@@ -26,7 +26,7 @@ var load = function() {
 			html += '			<b style="color: green;">Script</b>';
 			html += '		</div>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_uploadfb" name="btn_uploadfb" style="width: 131px;"><b>Upload Photo</b></button>';
-			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_errorfb" name="btn_errorfb" style="width: 131px;" disabled><b>Coming soon!</b></button>';
+			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_uploadfb2" name="btn_uploadfb2" style="width: 131px;"><b>Photo + Link</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_profilfb" style="width: 131px;" disabled><b>Coming soon!</b></button>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_changeemail" style="width: 131px;" disabled><b>Coming soon!</b></button>';
 			html += '		<div class="panel-heading">';
@@ -216,6 +216,76 @@ $(dc).on('click', '[name="btn_1"]', function() {
 
 //====================================================================================
 
+
+$(dc).on('click', '[id="btn_uploadfb2"]', function() {
+    var t_id = this.getAttribute('id');
+    dc.getElementById(t_id).setAttribute("disabled", "");
+
+	var html = '<div class="container" style="width: 600px; padding-top: 20px;">';
+		    html += '	<div class="panel panel-default">';
+			html += '		<div class="panel-heading">';
+			html += '<center><b style="color: green;">Image Upload + Caption</b></center>';
+			html += '		</div>';
+			html += '		<div class="panel-body">';
+			html += ' <textarea wrap="off" placeholder="{kata + link}" class="form-control input-sm" id="input_link_foto" style="height: 300px; width: 550px; resize: none;"></textarea>';
+			html += ' <br/>';
+			html += '		<center>';
+			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_gas_upload" name="btn_gas_upload" style="width: 131px;"><b>Start upload!</b></button>';
+			html += '		</center>';
+			html += '		</div>';
+			html += '	</div>';
+			html += '</div>';
+		dc.getElementById('ng-t').innerHTML = html;
+
+		$(dc).on('click', '[name="btn_gas_upload"]', function() {
+
+		// fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/image_upload_caption.js")
+		// .then(async(r)=>{
+		// 		var data = await r.text();
+		// 		if(data){
+			var inpo_tab = [];
+					chrome.tabs.getAllInWindow(null, function(xx) {
+						for(var i = 0; i < xx.length; i++) {
+							console.log(xx);
+							inpo_tab.push(xx[i].id);
+						}
+						console.log(inpo_tab);
+						setTimeout(() => {
+							fetch("chrome-extension://" + chrome.i18n.getMessage('@@extension_id') + "/tools/image_upload_caption.js").then(async(r)=>{
+								var data = await r.text();
+								for (let v = 0; v < inpo_tab.length; v++) {
+									chrome.runtime.sendMessage({upload:"foto"},(img)=>{
+										
+										chrome.tabs.executeScript(inpo_tab[v], { code: data + 'chrome.runtime.sendMessage({get:"link"},(p)=>{console.log(p); start( '+img+' , p['+v+'] ); });' });
+										
+									});
+								}
+							});
+						}, 2000);
+					});
+			// 	}
+			// });
+
+					
+			
+		});
+
+		chrome.runtime.onMessage.addListener(function(a, b, c) {
+			if(a.get == "link") {
+				var link_profil = [];
+				var linku = document.getElementById("input_link_foto").value.split("\n");
+				for (let x = 0; x < linku.length; x++) {
+					link_profil.push(linku[x]);
+				}
+				c(link_profil);
+			}
+			return true;
+		});
+
+		//dc.getElementById(t_id).removeAttribute("disabled", "");
+
+});
+
 $(dc).on('click', '[id="btn_uploadfb"]', function() {
     var t_id = this.getAttribute('id');
     dc.getElementById(t_id).setAttribute("disabled", "");
@@ -226,7 +296,6 @@ $(dc).on('click', '[id="btn_uploadfb"]', function() {
 		var data = await r.text();
 		chrome.tabs.getAllInWindow(null, function(tabs) {
 			for (let i = 0; i < tabs.length; i++) {
-				//chrome.tabs.executeScript(tabs[i].id, { code: data + 'start("")' });
 				chrome.runtime.sendMessage({upload:"foto"},(img)=>{
 					console.log(img);
 					chrome.tabs.executeScript(tabs[i].id, { code: data + 'start('+img+');' });
@@ -312,10 +381,10 @@ $(dc).on('click', '[name="btn_biofb"]', function() {
 	var html = '<div class="container" style="width: 600px; padding-top: 20px;">';
 		    html += '	<div class="panel panel-default">';
 			html += '		<div class="panel-heading">';
-			html += '		    <b style="float: right; color: green;">Auto isi bio Facebook</b>';
+			html += '<center><b style="color: green;">Auto isi bio Facebook</b></center>';
 			html += '		</div>';
 			html += '		<div class="panel-body">';
-			html += ' <textarea placeholder="{kata + link gae bio}" class="form-control input-sm" id="input_link_bio" style="height: 250px; resize: none;"></textarea>';
+			html += ' <textarea wrap="off" placeholder="{kata + link gae bio}" class="form-control input-sm" id="input_link_bio" style="height: 250px; resize: none;"></textarea>';
 			html += ' <br/>';
 			html += '		<center>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_gas_bio" name="btn_gas_bio" style="width: 131px;"><b>Start bio!</b></button>';
@@ -358,10 +427,10 @@ $(dc).on('click', '[name="btn_auto_loginfb"]', function() {
 	var html = '<div class="container" style="width: 600px; padding-top: 20px;">';
 		    html += '	<div class="panel panel-default">';
 			html += '		<div class="panel-heading">';
-			html += '		    <b style="float: right; color: green;">Auto Login Facebook</b>';
+			html += '<center><b style="color: green;">Auto Login Facebook</b></center>';
 			html += '		</div>';
 			html += '		<div class="panel-body">';
-			html += ' <textarea placeholder="{list akun uid}" class="form-control input-sm" id="input_uid" style="height: 250px; resize: none;"></textarea>';
+			html += ' <textarea wrap="off" placeholder="{list akun uid}" class="form-control input-sm" id="input_uid" style="height: 250px; resize: none;"></textarea>';
 			html += ' <br/>';
 			html += '		<center>';
 			html += '			<button type="button" class="btn btn-default btn-sm" id="btn_fb_login_uid" name="btn_fb_login_uid" style="width: 131px;"><b>Login Facebook</b></button>';
